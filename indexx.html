@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA Drafting AI Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff, #e6eeff);
+        }
+        .chat-container {
+            height: calc(100vh - 220px);
+        }
+        .message-bubble {
+            max-width: 80%;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .message-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .user-message {
+            background-color: #ffffff;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+        .bot-message {
+            background-color: #f0f4ff;
+            border-bottom-left-radius: 0;
+        }
+        .typing-indicator {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #f0f4ff;
+            border-radius: 20px;
+        }
+        .timestamp {
+            font-size: 0.7rem;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a5b4fc;
+        }
+        .bot-message h1, .bot-message h2, .bot-message h3 {
+            font-size: 1.25rem;
+            margin: 0.5rem 0;
+            color: #4c51bf; /* Indigo shade */
+        }
+
+        .bot-message p {
+            margin: 0.5rem 0;
+            line-height: 1.5;
+            color: #2d3748; /* Dark gray */
+        }
+
+        .bot-message strong {
+            font-weight: 600;
+            color: #2c5282; /* Blue */
+        }
+
+        .bot-message ul, .bot-message ol {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="text-gray-800">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-72 bg-white shadow-lg p-6 flex flex-col">
+            <div class="flex items-center mb-4">
+                <img src="data:image/png;base64,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" alt="AIChatPal Logo" class="h-8 w-8 mr-2">
+                <h1 class="text-2xl font-bold text-indigo-600">Conso</h1>
+                <p class="text-xl font-semibold text-indigo-300 ">Drafting AI</p>                
+            </div>
+            <button id="new-chat" class="bg-indigo-500 text-white rounded-full py-3 px-6 mb-6 hover:bg-indigo-600 transition duration-300 flex items-center justify-center">
+                <i data-feather="plus" class="w-5 h-5 mr-2"></i>
+                New Chat
+            </button>
+            <div id="chat-history" class="flex-grow overflow-y-auto space-y-3 custom-scrollbar">
+                <!-- Chat history items will be added here -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-gray-50">
+            <header class="bg-white shadow-sm p-6">
+                <h2 class="text-3xl font-semibold text-indigo-600">CA Drafting Assistant</h2>
+                <p class="text-gray-600 mt-2">Your AI-powered companion for expert legal drafting assistance</p>
+            </header>
+            <div class="flex-grow p-6 overflow-y-auto custom-scrollbar">
+                <div id="chat-messages" class="space-y-6">
+                    <!-- Messages will be added here -->
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="bg-white p-6 shadow-lg">
+                <form id="chat-form" class="flex items-center">
+                    <div class="flex-1 relative">
+                        <textarea 
+                            id="user-input"
+                            class="w-full bg-gray-100 text-gray-800 rounded-full pl-6 pr-16 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                            placeholder="Type your message..."
+                            rows="1"
+                        ></textarea>
+                        <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 text-white rounded-full p-2 hover:bg-indigo-600 transition duration-300">
+                            <i data-feather="send" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+        AOS.init();
+
+        const chatForm = document.getElementById('chat-form');
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const chatHistory = document.getElementById('chat-history');
+        const newChatButton = document.getElementById('new-chat');
+
+        let conversations = [];
+        let currentConversationId = Date.now();
+
+        chatForm.addEventListener('submit', handleSubmit);
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+            }
+        });
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            const typingIndicator = addTypingIndicator();
+
+            try {
+                const currentConversation = conversations.find(c => c.id === currentConversationId);
+                const history = currentConversation ? currentConversation.messages : [];
+
+                const response = await axios.post('https://abcd-1ail.onrender.com/chat', {
+                message: message,
+                history: history
+                });
+
+                typingIndicator.remove();
+                const botResponse = response.data.response;
+                addMessage(botResponse, 'bot');
+                updateConversationHistory(message, botResponse);
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.remove();
+                addMessage('Sorry, there was an error processing your request.', 'bot');
+            }
+        }
+
+        // function addMessage(message, sender) {
+        //     const div = document.createElement('div');
+        //     div.classList.add(
+        //         'message-bubble',
+        //         sender === 'user' ? 'user-message' : 'bot-message'
+        //     );
+        //     div.setAttribute('data-aos', 'fade-up');
+            
+        //     const messageContent = document.createElement('div');
+        //     messageContent.textContent = message;
+        //     div.appendChild(messageContent);
+
+        //     const timestamp = document.createElement('div');
+        //     timestamp.classList.add('timestamp');
+        //     timestamp.textContent = new Date().toLocaleTimeString();
+        //     div.appendChild(timestamp);
+
+        //     chatMessages.appendChild(div);
+        //     chatMessages.scrollTop = chatMessages.scrollHeight;
+        // }
+
+        function addMessage(message, sender) {
+            const div = document.createElement('div');
+            div.classList.add(
+                'message-bubble',
+                sender === 'user' ? 'user-message' : 'bot-message'
+            );
+            div.setAttribute('data-aos', 'fade-up');
+
+            const messageContent = document.createElement('div');
+
+            // If the sender is a bot, render the message as HTML
+            if (sender === 'bot') {
+                messageContent.innerHTML = message; // Allow structured content
+            } else {
+                messageContent.textContent = message; // Escape HTML for user input
+            }
+
+            div.appendChild(messageContent);
+
+            const timestamp = document.createElement('div');
+            timestamp.classList.add('timestamp');
+            timestamp.textContent = new Date().toLocaleTimeString();
+            div.appendChild(timestamp);
+
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const div = document.createElement('div');
+            div.classList.add('message-bubble', 'bot-message');
+            div.innerHTML = '<div class="typing-indicator">AI is drafting<span class="dot-animation">...</span></div>';
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
+
+        function updateConversationHistory(userMessage, botResponse) {
+            const conversation = conversations.find(c => c.id === currentConversationId);
+            if (conversation) {
+                conversation.messages.push({ user: userMessage, bot: botResponse });
+            } else {
+                conversations.push({
+                    id: currentConversationId,
+                    messages: [{ user: userMessage, bot: botResponse }]
+                });
+            }
+            renderConversationHistory();
+        }
+
+        function renderConversationHistory() {
+            chatHistory.innerHTML = '';
+            conversations.forEach(conversation => {
+                const div = document.createElement('div');
+                div.classList.add('p-3', 'bg-gray-100', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-200', 'transition', 'duration-300');
+                div.textContent = conversation.messages[0].user.substring(0, 25) + '...';
+                div.addEventListener('click', () => loadConversation(conversation.id));
+                chatHistory.appendChild(div);
+            });
+        }
+
+        function loadConversation(conversationId) {
+            currentConversationId = conversationId;
+            chatMessages.innerHTML = '';
+            const conversation = conversations.find(c => c.id === conversationId);
+            conversation.messages.forEach(message => {
+                addMessage(message.user, 'user');
+                addMessage(message.bot, 'bot');
+            });
+        }
+
+        newChatButton.addEventListener('click', () => {
+            currentConversationId = Date.now();
+            chatMessages.innerHTML = '';
+            addMessage("Hello! I'm your CA Drafting AI Assistant. How can I help you with your legal drafting needs today?", 'bot');
+        });
+
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Initial welcome message
+        addMessage("Welcome to the CA Drafting AI Assistant! I'm here to help you with your legal drafting needs. How can I assist you today?", 'bot');
+    </script>
+</body>
+</html>
