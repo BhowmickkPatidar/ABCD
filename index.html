@@ -172,7 +172,7 @@
                 const currentConversation = conversations.find(c => c.id === currentConversationId);
                 const history = currentConversation ? currentConversation.messages : [];
 
-                const response = await axios.post('http://127.0.0.1:5000/chat', {
+                const response = await axios.post('https://abcd-1ail.onrender.com/chat', {
                 message: message,
                 history: history
                 });
