@@ -9,6 +9,7 @@ import markdown2
 # Load environment variables
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
@@ -27,7 +28,7 @@ def chat():
         if not message:
             return jsonify({"error": "No message provided"}), 400
         
-        # Print debug information
+        # Debugging information
         print(f"Received message: {message}")
         
         # Create chat completion using Groq client
@@ -63,8 +64,6 @@ def chat():
         print(f"Error in chat endpoint: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-
-
 @app.route("/health", methods=["GET"])
 def health_check():
     api_key_status = bool(os.environ.get("GROQ_API_KEY"))
@@ -74,6 +73,6 @@ def health_check():
         "model": "llama-3.3-70b-versatile"
     }), 200
 
-if __name__ == "__main__":
-    print(f"Starting server with Groq API configured: {'Yes' if os.environ.get('GROQ_API_KEY') else 'No'}")
-    app.run(debug=True)
+# Application entry point for WSGI
+def create_app():
+    return app
