@@ -113,6 +113,10 @@
             <div class="flex-grow p-6 overflow-y-auto custom-scrollbar">
                 <div id="chat-messages" class="space-y-6">
                     <!-- Messages will be added here -->
+                    <div class="message-bubble bot-message">
+                        <h1>Welcome to the CA Drafting AI Assistant!</h1>
+                        <p>I'm here to assist you with legal drafting queries. Feel free to ask me anything.</p>
+                    </div>
                 </div>
             </div>
             
@@ -189,7 +193,7 @@
         function addMessage(message, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message-bubble', sender === 'user' ? 'user-message' : 'bot-message');
-            messageDiv.textContent = message;
+            messageDiv.innerHTML = message;
             const timestamp = document.createElement('span');
             timestamp.classList.add('timestamp');
             timestamp.textContent = new Date().toLocaleTimeString();
@@ -220,7 +224,12 @@
         newChatButton.addEventListener('click', () => {
             currentConversationId = Date.now();
             conversations.push({ id: currentConversationId, messages: [] });
-            chatMessages.innerHTML = '';
+            chatMessages.innerHTML = `
+                <div class="message-bubble bot-message">
+                    <h1>Welcome to the CA Drafting AI Assistant!</h1>
+                    <p>I'm here to assist you with legal drafting queries. Feel free to ask me anything.</p>
+                </div>
+            `;
         });
     </script>
 </body>
