@@ -72,11 +72,9 @@ def health_check():
         "model": "llama-3.3-70b-versatile"
     }), 200
 
-# Application entry point for WSGI
-def create_app():
-    return app
+
 
 # In production, Gunicorn will use `create_app()` to run the application
 if __name__ == "__main__":
     # This is for local development, use Gunicorn in production
-    app.run(debug=True)
+    app.run()
