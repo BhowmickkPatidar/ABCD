@@ -3,7 +3,6 @@ from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 from groq import Groq
-import json
 import markdown2
 
 # Load environment variables
@@ -76,3 +75,8 @@ def health_check():
 # Application entry point for WSGI
 def create_app():
     return app
+
+# In production, Gunicorn will use `create_app()` to run the application
+if __name__ == "__main__":
+    # This is for local development, use Gunicorn in production
+    app.run(debug=True)
