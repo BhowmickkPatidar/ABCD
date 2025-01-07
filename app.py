@@ -38,6 +38,8 @@ def chat():
                     "content": (
                         "You are a highly skilled CA Drafting AI Assistant. "
                         "Your primary role is to assist users in drafting accurate, professional, and well-structured documents. "
+                        "Incorporate the additional details if they provide into the draft. "
+                        "Always provide detailed draft with well-structured clauses and expanded explanations to ensure clarity. "
                         "Always use headings, bullet points, numbered lists, and proper formatting. "
                         "For agreements, follow templates with clear sections, subclauses, and formal language."
                     )
@@ -49,7 +51,7 @@ def chat():
             ],
             model="llama-3.3-70b-versatile",
             temperature=0.5,
-            max_tokens=1000
+            max_tokens=3000
         )
         
         response = chat_completion.choices[0].message.content
